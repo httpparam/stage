@@ -29,7 +29,16 @@
   <body class="h-full bg-base text-text font-sans">
     <%= render partial: "shared/flash" %>
     <div id="session_content" class="min-h-full">
-      <%= yield %>
+      <% if current_user %>
+        <div class="flex min-h-screen">
+          <%= render partial: "shared/sidebar" %>
+          <main class="flex-1 ml-72 p-8">
+            <%= yield %>
+          </main>
+        </div>
+      <% else %>
+        <%= yield %>
+      <% end %>
     </div>
   </body>
 </html>
