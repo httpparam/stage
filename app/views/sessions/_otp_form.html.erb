@@ -1,0 +1,86 @@
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 pt-[20vh]" data-controller="session" data-session-expires-in-value="<%= user.seconds_until_expiry %>">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-text">Check your email</h2>
+    <p class="mt-2 text-center text-sm text-subtext0">We sent a 6-digit code to <span class="text-text font-medium"><%= user.email %></span></p>
+  </div>
+
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <%= form_with url: session_path(email_token: user.id), method: :patch, data: { turbo: true } do |f| %>
+      <div>
+        <label class="block text-sm/6 font-medium text-text mb-4">Enter your code</label>
+        <div class="flex justify-center gap-x-3" data-session-target="pinWrapper">
+          <input type="text"
+                 class="block w-12 h-12 text-center text-xl font-semibold bg-surface0 border border-surface2 rounded-md text-text focus:outline-2 focus:-outline-offset-2 focus:outline-mauve"
+                 maxlength="1"
+                 inputmode="numeric"
+                 pattern="[0-9]"
+                 autocomplete="one-time-code"
+                 autofocus
+                 data-session-target="pinInput"
+                 data-action="input->session#handlePinInput keydown->session#handlePinKeydown paste->session#handlePinPaste">
+          <input type="text"
+                 class="block w-12 h-12 text-center text-xl font-semibold bg-surface0 border border-surface2 rounded-md text-text focus:outline-2 focus:-outline-offset-2 focus:outline-mauve"
+                 maxlength="1"
+                 inputmode="numeric"
+                 pattern="[0-9]"
+                 data-session-target="pinInput"
+                 data-action="input->session#handlePinInput keydown->session#handlePinKeydown">
+          <input type="text"
+                 class="block w-12 h-12 text-center text-xl font-semibold bg-surface0 border border-surface2 rounded-md text-text focus:outline-2 focus:-outline-offset-2 focus:outline-mauve"
+                 maxlength="1"
+                 inputmode="numeric"
+                 pattern="[0-9]"
+                 data-session-target="pinInput"
+                 data-action="input->session#handlePinInput keydown->session#handlePinKeydown">
+          <input type="text"
+                 class="block w-12 h-12 text-center text-xl font-semibold bg-surface0 border border-surface2 rounded-md text-text focus:outline-2 focus:-outline-offset-2 focus:outline-mauve"
+                 maxlength="1"
+                 inputmode="numeric"
+                 pattern="[0-9]"
+                 data-session-target="pinInput"
+                 data-action="input->session#handlePinInput keydown->session#handlePinKeydown">
+          <input type="text"
+                 class="block w-12 h-12 text-center text-xl font-semibold bg-surface0 border border-surface2 rounded-md text-text focus:outline-2 focus:-outline-offset-2 focus:outline-mauve"
+                 maxlength="1"
+                 inputmode="numeric"
+                 pattern="[0-9]"
+                 data-session-target="pinInput"
+                 data-action="input->session#handlePinInput keydown->session#handlePinKeydown">
+          <input type="text"
+                 class="block w-12 h-12 text-center text-xl font-semibold bg-surface0 border border-surface2 rounded-md text-text focus:outline-2 focus:-outline-offset-2 focus:outline-mauve"
+                 maxlength="1"
+                 inputmode="numeric"
+                 pattern="[0-9]"
+                 data-session-target="pinInput"
+                 data-action="input->session#handlePinInput keydown->session#handlePinKeydown">
+          <%= f.hidden_field :otp_code, data: { session_target: "otpInput" } %>
+        </div>
+        <% if defined?(error) && error %>
+          <p class="mt-3 text-center text-sm text-red"><%= error %></p>
+        <% end %>
+      </div>
+
+      <div class="mt-6">
+        <%= f.submit "Verify code", class: "flex w-full justify-center rounded-md bg-mauve px-3 py-1.5 text-sm/6 font-semibold text-crust hover:bg-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mauve transition-colors" %>
+      </div>
+    <% end %>
+
+    <div class="mt-8 flex flex-col items-center gap-4">
+      <div class="text-sm text-subtext0" data-session-target="countdown">
+        Code expires in <span class="text-text font-medium" data-session-target="timer">10:00</span>
+      </div>
+
+      <div class="flex items-center gap-2 text-sm">
+        <%= button_to "Resend code",
+            session_path(email: user.email),
+            method: :post,
+            class: "font-semibold text-mauve hover:text-pink transition-colors",
+            data: { session_target: "resendBtn", action: "click->session#handleResend" },
+            disabled: false %>
+        <span class="text-overlay0" data-session-target="cooldown"></span>
+      </div>
+
+      <%= link_to "Use a different email", new_session_path, class: "text-sm font-semibold text-mauve hover:text-pink transition-colors" %>
+    </div>
+  </div>
+</div>

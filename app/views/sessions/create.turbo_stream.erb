@@ -1,0 +1,9 @@
+<%= turbo_stream.replace "flash" do %>
+  <%= render partial: "shared/flash", locals: { notice: nil, alert: nil } %>
+<% end %>
+
+<%= turbo_stream.replace "session_content" do %>
+  <div id="session_content">
+    <%= render partial: "sessions/otp_form", locals: { user: @user } %>
+  </div>
+<% end %>
