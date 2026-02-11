@@ -1,0 +1,192 @@
+<% content_for :title, @event.name %>
+
+<% is_admin = @event.admin?(current_user) %>
+
+<div class="max-w-6xl">
+  <%# Event Header %>
+  <div class="mb-10">
+    <div class="flex items-start justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="text-3xl font-bold text-text"><%= @event.name %></h1>
+          <% if is_admin %>
+            <span class="inline-flex items-center px-2 py-1 text-xs bg-mauve/20 text-mauve rounded-lg">Admin</span>
+          <% end %>
+        </div>
+        <p class="text-subtext0"><%= @event.description || "No description" %></p>
+        <div class="flex items-center gap-4 mt-3 text-sm text-subtext0">
+          <span class="inline-flex items-center gap-x-1">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <%= @event.event_date&.strftime("%B %d, %Y") || "TBD" %>
+          </span>
+          <span class="inline-flex items-center gap-x-1">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <%= @event.participants.count %> participants
+          </span>
+          <span class="inline-flex items-center gap-x-1">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <%= @event.vote_count %> total votes
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-mauve bg-mauve/10 px-2 py-1 rounded"><%= @event.invite_code %></span>
+        <button type="button" onclick="navigator.clipboard.writeText('<%= @event.invite_code %>')" class="p-2 text-subtext0 hover:text-text hover:bg-surface0 rounded-lg transition-colors" title="Copy invite code">
+          <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2 0-1.1.9-2 2-2s2 .9 2 2c0 1.1-.9 2-2 2-2-.9-2-2-2z"/><path d="M20 12c0-1.1-.9-2-2-2-2 0-1.1.9-2 2-2s2 .9 2 2c0 1.1-.9 2-2 2 2 .9 2 2 2z"/></svg>
+        </button>
+
+        <% if is_admin %>
+          <%= link_to edit_event_path(@event), class: "p-2 text-subtext0 hover:text-text hover:bg-surface0 rounded-lg transition-colors", title: "Edit event" do %>
+            <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l3.3-10.4a2.85 2.83 0 0 1 3.5-3.5l2.6 2.6zM14.5 6.5l2.6 2.6"/></svg>
+          <% end %>
+        <% end %>
+
+        <%= button_to leave_event_path(@event), method: :post, class: "p-2 text-subtext0 hover:text-red hover:bg-red/10 rounded-lg transition-colors", title: "Leave event", form: { data: { turbo_confirm: "Are you sure you want to leave this event?" } } do %>
+          <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Admin Actions Bar %>
+  <% if is_admin %>
+    <div class="mb-8 flex items-center justify-between bg-mantle/50 rounded-xl p-4 border border-surface2">
+      <div>
+        <h2 class="text-lg font-semibold text-text">Admin Actions</h2>
+        <p class="text-sm text-subtext0">Manage participants and projects</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <%= link_to edit_event_path(@event), class: "inline-flex items-center gap-x-2 py-2 px-4 rounded-lg text-sm font-medium bg-surface1 text-text hover:bg-surface2 transition-colors" do %>
+          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l3.3-10.4a2.85 2.83 0 0 1 3.5-3.5l2.6 2.6zM14.5 6.5l2.6 2.6"/></svg>
+          Edit Event
+        <% end %>
+        <%= button_to event_path(@event), method: :delete, class: "inline-flex items-center gap-x-2 py-2 px-4 rounded-lg text-sm font-medium bg-red/20 text-red hover:bg-red/30 transition-colors", form: { data: { turbo_confirm: "Are you sure? This will delete the event and all associated data." } } do %>
+          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Delete Event
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Add Project Form (Admin Only) %>
+  <% if is_admin %>
+    <div class="mb-10">
+      <div class="bg-surface0 rounded-2xl border border-surface2 p-6">
+        <h2 class="text-lg font-semibold text-text mb-4">Add Project</h2>
+        <%= form_with model: [@event, Project.new], url: event_projects_path(@event), data: { turbo_frame: "projects" } do |f| %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <%= f.label :name, class: "block text-sm font-medium text-text mb-2" %>
+              <%= f.text_field :name, class: "w-full rounded-lg bg-surface1 px-4 py-2.5 text-text border border-surface2 focus:outline-2 focus:-outline-offset-2 focus:outline-mauve text-sm", placeholder: "Project name", required: true %>
+            </div>
+            <div class="contents gap-4">
+              <div>
+                <%= f.label :demo_url, "Demo URL", class: "block text-sm font-medium text-text mb-2" %>
+                <%= f.url_field :demo_url, class: "w-full rounded-lg bg-surface1 px-4 py-2.5 text-text border border-surface2 focus:outline-2 focus:-outline-offset-2 focus:outline-mauve text-sm", placeholder: "https://" %>
+              </div>
+              <div>
+                <%= f.label :github_url, "GitHub URL", class: "block text-sm font-medium text-text mb-2" %>
+                <%= f.url_field :github_url, class: "w-full rounded-lg bg-surface1 px-4 py-2.5 text-text border border-surface2 focus:outline-2 focus:-outline-offset-2 focus:outline-mauve text-sm", placeholder: "https://github.com/" %>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <%= f.label :description, class: "block text-sm font-medium text-text mb-2" %>
+            <%= f.text_area :description, rows: 2, class: "w-full rounded-lg bg-surface1 px-4 py-2.5 text-text border border-surface2 focus:outline-2 focus:-outline-offset-2 focus:outline-mauve text-sm", placeholder: "Brief project description..." %>
+          </div>
+          <%= f.submit "Add Project", class: "w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-mauve text-crust hover:bg-pink transition-colors" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Projects Grid %>
+  <div class="mb-10">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-text">Projects</h2>
+      <span class="text-sm text-subtext0"><%= @projects.count %> projects</span>
+    </div>
+
+    <%= turbo_frame_tag "projects" do %>
+      <% if @projects.any? %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% @projects.each do |project| %>
+            <%= render partial: "events/project_card", locals: { project: project, is_admin: is_admin } %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-16">
+          <svg class="size-16 text-subtext0 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z"/><path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8"/><path d="M15 2v5h5"/></svg>
+          <h3 class="text-lg font-medium text-text mb-2">No projects yet</h3>
+          <p class="text-subtext0"><%= is_admin ? "Add the first project to get started" : "Waiting for projects to be added" %></p>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Leaderboard %>
+  <div>
+    <h2 class="text-xl font-semibold text-text mb-6">Leaderboard</h2>
+    <div class="bg-surface0 rounded-2xl border border-surface2 overflow-hidden">
+      <% ranked_projects = @projects.sort_by { |p| -p.vote_count } %>
+      <% if ranked_projects.any? %>
+        <table class="w-full">
+          <thead class="bg-surface1 text-left text-xs text-subtext0 uppercase tracking-wider">
+            <tr>
+              <th class="px-6 py-4 font-medium">Rank</th>
+              <th class="px-6 py-4 font-medium">Project</th>
+              <th class="px-6 py-4 font-medium">Team</th>
+              <th class="px-6 py-4 font-medium text-right">Votes</th>
+              <% if is_admin %>
+                <th class="px-6 py-4 font-medium text-right">Actions</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface2">
+            <% ranked_projects.each_with_index do |project, index| %>
+              <tr class="hover:bg-surface1/50 transition-colors">
+                <td class="px-6 py-4">
+                  <% if index == 0 %>
+                    <span class="inline-flex items-center justify-center size-8 rounded-full bg-yellow text-mantle font-bold text-sm">1</span>
+                  <% elsif index == 1 %>
+                    <span class="inline-flex items-center justify-center size-8 rounded-full bg-surface2 text-text font-bold text-sm">2</span>
+                  <% elsif index == 2 %>
+                    <span class="inline-flex items-center justify-center size-8 rounded-full bg-orange/30 text-text font-bold text-sm">3</span>
+                  <% else %>
+                    <span class="inline-flex items-center justify-center size-8 rounded-full text-subtext0 text-sm"><%= index + 1 %></span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="font-medium text-text"><%= project.name %></div>
+                  <% if project.voted_by?(current_user) %>
+                    <span class="inline-flex items-center gap-x-1 text-xs text-mauve mt-1">
+                      <svg class="size-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      Voted
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 text-subtext0"><%= project.user.display_name %></td>
+                <td class="px-6 py-4 text-right">
+                  <span class="inline-flex items-center gap-x-1 font-semibold text-text">
+                    <%= project.vote_count %>
+                    <svg class="size-4 text-subtext0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                  </span>
+                </td>
+                <% if is_admin %>
+                  <td class="px-6 py-4 text-right">
+                    <%= button_to event_admin_vote_path(@event, project), method: :delete, class: "text-red hover:text-red/70 transition-colors", form: { data: { turbo_confirm: "Remove votes for this project?" } } do %>
+                      <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    <% end %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="text-center py-12 text-subtext0">No projects yet</div>
+      <% end %>
+    </div>
+  </div>
+</div>

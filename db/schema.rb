@@ -10,9 +10,43 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_02_11_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_11_121237) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "event_participants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.boolean "is_admin", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["event_id", "user_id"], name: "index_event_participants_on_event_id_and_user_id", unique: true
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.date "event_date"
+    t.string "invite_code", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["invite_code"], name: "index_events_on_invite_code", unique: true
+    t.index ["user_id"], name: "index_events_on_user_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "demo_url"
+    t.text "description"
+    t.bigint "event_id", null: false
+    t.string "github_url"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["event_id"], name: "index_projects_on_event_id"
+    t.index ["user_id"], name: "index_projects_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.integer "age"
@@ -25,4 +59,21 @@ ActiveRecord::Schema[8.1].define(version: 2025_02_11_000001) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
+
+  create_table "votes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_votes_on_project_id"
+    t.index ["user_id", "project_id"], name: "index_votes_on_user_id_and_project_id", unique: true
+  end
+
+  add_foreign_key "event_participants", "events"
+  add_foreign_key "event_participants", "users"
+  add_foreign_key "events", "users"
+  add_foreign_key "projects", "events"
+  add_foreign_key "projects", "users"
+  add_foreign_key "votes", "projects"
+  add_foreign_key "votes", "users"
 end

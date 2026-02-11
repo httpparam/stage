@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Can be used for load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
@@ -20,4 +20,30 @@ Rails.application.routes.draw do
 
   # Profile
   resource :profile, only: %i[show edit update]
+
+  # Events
+  resources :events, only: %i[index new create show edit update destroy] do
+    member do
+      post :join
+      post :leave
+    end
+
+    # Projects nested under events
+    resources :projects, only: %i[create destroy] do
+      member do
+        # Vote for a project (create/remove own vote)
+        post :vote, to: "votes#create"
+        delete :vote, to: "votes#destroy"
+      end
+    end
+
+    # Admin vote management (revoke any user's vote)
+    namespace :admin, module: :events do
+      resources :votes, only: %i[destroy] do
+        member do
+          post :revoke
+        end
+      end
+    end
+  end
 end

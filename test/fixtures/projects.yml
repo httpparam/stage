@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  demo_url: MyString
+  github_url: MyString
+  description: MyText
+  event: one
+  user: one
+
+two:
+  name: MyString
+  demo_url: MyString
+  github_url: MyString
+  description: MyText
+  event: two
+  user: two

@@ -55,6 +55,12 @@ class User < ApplicationRecord
     first_name.present? && age.present?
   end
 
+  has_many :events, dependent: :destroy, foreign_key: :user_id
+  has_many :projects, dependent: :destroy
+  has_many :votes, dependent: :destroy
+  has_many :event_participations, class_name: "EventParticipant", dependent: :destroy
+  has_many :participated_events, through: :event_participations, source: :event
+
   def seconds_until_expiry
     return 0 if otp_sent_at.blank?
     expiry_time = otp_sent_at + OTP_EXPIRY_MINUTES.minutes

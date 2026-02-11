@@ -1,0 +1,70 @@
+<% content_for :title, "Events" %>
+
+<div class="max-w-6xl">
+  <div class="flex items-center justify-between mb-10">
+    <div>
+      <h1 class="text-3xl font-bold text-text">Events</h1>
+      <p class="mt-2 text-subtext0">Create and join peer voting events</p>
+    </div>
+    <%= link_to "New Event", new_event_path, class: "inline-flex items-center gap-x-2 py-2.5 px-4 rounded-lg text-sm font-semibold bg-mauve text-crust hover:bg-pink transition-colors" %>
+  </div>
+
+  <%# My Events Section %>
+  <% if @user_events.any? %>
+    <div class="mb-10">
+      <h2 class="text-lg font-semibold text-text mb-4">My Events</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @user_events.each do |event| %>
+          <%= render partial: "event_card", locals: { event: event, is_owner: true } %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Participated Events Section %>
+  <% if @participated_events.any? %>
+    <div class="mb-10">
+      <h2 class="text-lg font-semibold text-text mb-4">Participating Events</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @participated_events.each do |event| %>
+          <%= render partial: "event_card", locals: { event: event, is_owner: false } %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Join Event Section %>
+  <div class="bg-surface0 rounded-2xl border border-surface2 p-8">
+    <h2 class="text-lg font-semibold text-text mb-4">Join an Event</h2>
+    <p class="text-subtext0 mb-6">Enter an invite code to join an existing event.</p>
+
+    <%= form_with url: join_event_path("placeholder"), method: :post, data: { turbo_frame: "join_result" } do |f| %>
+      <div class="flex gap-4">
+        <div class="flex-1">
+          <input
+            type="text"
+            name="invite_code"
+            placeholder="Enter invite code"
+            class="w-full rounded-lg bg-surface1 px-4 py-3 text-text border border-surface2 focus:outline-2 focus:-outline-offset-2 focus:outline-mauve uppercase"
+            required
+          >
+        </div>
+        <%= f.submit "Join", class: "py-3 px-6 rounded-lg text-sm font-semibold bg-mauve text-crust hover:bg-pink transition-colors" %>
+      </div>
+    <% end %>
+
+    <%= turbo_frame_tag "join_result" do %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener("submit", function(event) {
+  if (event.target.action.includes("/events/")) {
+    const codeInput = event.target.querySelector('input[name="invite_code"]');
+    if (codeInput) {
+      event.target.action = event.target.action.replace("placeholder", codeInput.value.toUpperCase());
+    }
+  }
+});
+</script>
